@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<title>Kairis</title>
+<section id="content1"></section>
+<script type="text/javascript">
+  function startt() {
+    ply.loop = true;
+    ply.play();
+    overrr.loop = false;
+    contt.style.display = "block";
+    game.style.display = "block";
+    start.style.display = "none";
+    playerReset();
+    updateScore();
+    update();
+    var ele = document.documentElement;
+  }
+
+  function howtoplay() {
+    open("./HowToPlay.html", "_blank")
+  }
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script type="text/javascript">
+  var startX = null;
+  var endX = null;
+  var endY = null;
+  let dist = 30;
+
+  window.addEventListener('load', function () {
+
+    // スワイプ／フリック
+    document.getElementById("content1").addEventListener('touchmove', logSwipe);
+
+    // タッチ開始
+    document.getElementById("content1").addEventListener('touchstart', logSwipeStart);
+
+    // タッチ終了
+    document.getElementById("content1").addEventListener('touchend', logSwipeEnd);
+  });
+
+  function logSwipeStart(event) {
+    event.preventDefault();
+
+    startX = event.touches[0].pageX;
+    startY = event.touches[0].pageY;
+  }
+
+  function logSwipe(event) {
+    event.preventDefault();
+
+    endX = event.touches[0].pageX;
+    endY = event.touches[0].pageY;
+  }
+
+  function logSwipeEnd(event) {
+    event.preventDefault();
+
+    if (0 < (endX + dist - startX)) {
+      playerMove(1);
+      move_sound();
+    }
+    if (0 < (startX + dist - endX)) {
+      playerMove(-1);
+      move_sound();
+    }
+    if (0 < (endY - dist - startY)) {
+      playerDrop();
+      move_sound();
+    }
+    if (0 < (startY - dist - endY)) {
+      playerRotate(1);
+      move_sound();
+    }
+  }
+</script>
+
+<audio id="play" src="./Tetris.mp3" hidden></audio>
+<audio id="good" src="./good.mp3" hidden></audio>
+<audio id="move" src="./move.mp3" hidden></audio>
+<audio id="over" src="./me_game_gameover.wav" hidden></audio>
+
+<meta name="viewport"
+  content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<html lang="ja" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <div class="space">
+    <div class="stars">
+      <span class="star anim"></span>
+      <span class="star anim"></span>
+      <span class="star anim"></span>
+      <span class="star anim"></span>
+      <span class="star anim"></span>
+      <span class="star anim"></span>
+      <span class="star anim"></span>
+      <span class="star anim"></span>
+      <span class="star anim"></span>
+      <span class="star anim"></span>
+      <span class="star anim"></span>
+      <span class="star anim"></span>
+    </div>
+  </div>
+</head>
+
+<body background="Background.png">
+  <canvas id="tetris" width="960" height="1600" style="display: none;"></canvas>
+  <canvas id="nextc" width="200" height="200"></canvas>
+  <div class="start">
+    <button onclick="startt()" class="play1">プレイ</button>
+    <button onclick="howtoplay()" class="howtoplay1">遊び方</button>
+
+  </div>
+  <div class="sousa">
+    <button class="migi" onclick="playerMove(1), move_sound();">右</button>
+    <button class="hidari" onclick="playerMove(-1), move_sound();">左</button>
+    <button class="sita" onclick="playerDrop(), move_sound();">下</button>
+    <button class="migi-rot" onclick="playerRotate(1), rotate_sound();;">右回転</button>
+    <button class="hidari-rot" onclick="playerRotate(-1), rotate_sound();">左回転</button>
+  </div>
+  <div id="score" class="score"></div>
+  <div class="overr">
+    <div class="overrs"></div>
+    <div><button onclick="reload()" class="overBtn">もう一度</button></div>
+  </div>
+  <div class="conttt" style="display: none;">
+  </div>
+  <script src="app.js" charset="utf-8"></script>
+</body>
+
+</html>
+
+
+<style>
+  body,
+  html {
+    justify-content: center;
+    display: flex;
+    font-family: 'MyFont';
+    margin: 0;
+    padding: 0;
+    user-select: none;
+  }
+
+  @font-face {
+    font-family: 'MyFont';
+    src: url("Corporate-Logo-Rounded.ttf") format("truetype");
+  }
+
+  @media (orientation: portrait) {
+    #tetris {
+      width: auto;
+      height: 80%;
+      top: 0%;
+    }
+  }
+
+  @media(min-width:912px) {
+    .sousa {
+      display: none !important;
+    }
+  }
+
+  @media (orientation: portrait) and (max-width:768px) {
+    #tetris {
+      width: auto;
+      height: 80%;
+      top: 0%;
+    }
+
+    .conttt {
+      position: fixed;
+      z-index: 18;
+      top: 90%;
+      width: 100%;
+      height: 10%;
+      transform: translate(-50%, -50%);
+      left: 50%;
+      text-align: center;
+    }
+
+    .conttt button {
+      width: 20%;
+      height: 100%;
+      font-family: 'MyFont';
+      box-shadow: 0px 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0px 6px 20px 0 rgba(0, 0, 0, 0.19);
+      outline: none;
+      border: none;
+      border-radius: 5px;
+      background: #fff;
+      cursor: pointer;
+      -webkit-tap-highlight-color: rgba(4, 0, 253, 0);
+    }
+  }
+
+  @media (orientation: landscape) {
+    .conttt {
+      z-index: -100;
+    }
+
+    #tetris {
+      height: 100%;
+    }
+  }
+
+
+  .overr {
+    z-index: 16;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    box-shadow: 0px 4px 8px 0 rgba(0, 0, 0, 0.2),
+      0px 6px 20px 0 rgba(0, 0, 0, 0.19);
+    transition: all 0.3s ease;
+    display: none;
+    width: 440px;
+    height: 260px;
+    font-size: 4rem;
+    color: #007bff;
+    padding: 15px 30px;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    background: #fff;
+    cursor: pointer;
+    font-family: 'MyFont';
+  }
+
+  .overBtn {
+    position: relative;
+    top: 120px;
+    left: 105px;
+    width: 220px;
+    height: 67.3px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #007bff;
+    padding: 15px 30px;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    background: #fff;
+    cursor: pointer;
+    box-shadow: 0px 4px 8px 0 rgba(0, 0, 0, 0.2),
+      0px 6px 20px 0 rgba(0, 0, 0, 0.19);
+    z-index: 16;
+    font-family: 'MyFont';
+    transition: all 0.3s ease;
+    transform: translate(-50%, -50%);
+  }
+
+  .overr p {
+    z-index: 16;
+    top: 20%;
+    left: 50%;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    transition: all 0.3s ease;
+    display: none;
+    width: 440px;
+    height: 260px;
+    font-size: 10rem;
+    color: #007bff;
+    padding: 15px 30px;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    background: #fff;
+    cursor: pointer;
+    font-family: 'MyFont';
+  }
+
+  .score {
+    z-index: 11;
+    color: #fff;
+    font-size: 3rem;
+    top: 10px;
+    position: fixed;
+  }
+
+  #content1 {
+    padding: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: 15;
+  }
+
+  .play1 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 220px;
+    height: 67.3px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #007bff;
+    padding: 15px 30px;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    background: #fff;
+    cursor: pointer;
+    box-shadow: 0px 4px 8px 0 rgba(0, 0, 0, 0.2),
+      0px 6px 20px 0 rgba(0, 0, 0, 0.19);
+    z-index: 16;
+    font-family: 'MyFont';
+    transition: all 0.3s ease;
+    transform: translate(-50%, -50%);
+  }
+
+  .howtoplay1 {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    width: 220px;
+    height: 67.3px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #007bff;
+    padding: 15px 30px;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    background: #fff;
+    cursor: pointer;
+    box-shadow: 0px 4px 8px 0 rgba(0, 0, 0, 0.2),
+      0px 6px 20px 0 rgba(0, 0, 0, 0.19);
+    z-index: 16;
+    font-family: 'MyFont';
+    transition: all 0.3s ease;
+    transform: translate(-50%, -50%);
+  }
+
+  .hidari {
+    position: absolute;
+    top: 85%;
+    left: 20%;
+    width: 80px;
+    height: 60.3px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #007bff;
+    padding: 15px 30px;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    background: #fff;
+    cursor: pointer;
+    box-shadow: 0px 4px 8px 0 rgba(0, 0, 0, 0.2),
+      0px 6px 20px 0 rgba(0, 0, 0, 0.19);
+    z-index: 16;
+    font-family: 'MyFont';
+    transition: all 0.3s ease;
+    transform: translate(-50%, -50%);
+  }
+
+  .hidari-rot {
+    position: absolute;
+    top: 95%;
+    left: 28%;
+    width: 100px;
+    height: 60.3px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #007bff;
+    padding: 15px 30px;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    background: #fff;
+    cursor: pointer;
+    box-shadow: 0px 4px 8px 0 rgba(0, 0, 0, 0.2),
+      0px 6px 20px 0 rgba(0, 0, 0, 0.19);
+    z-index: 16;
+    font-family: 'MyFont';
+    transition: all 0.3s ease;
+    transform: translate(-50%, -50%);
+  }
+
+  .migi-rot {
+    position: absolute;
+    top: 95%;
+    left: 68%;
+    width: 100px;
+    height: 60.3px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #007bff;
+    padding: 15px 30px;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    background: #fff;
+    cursor: pointer;
+    box-shadow: 0px 4px 8px 0 rgba(0, 0, 0, 0.2),
+      0px 6px 20px 0 rgba(0, 0, 0, 0.19);
+    z-index: 16;
+    font-family: 'MyFont';
+    transition: all 0.3s ease;
+    transform: translate(-50%, -50%);
+  }
+
+  .migi {
+    position: absolute;
+    top: 85%;
+    left: 80%;
+    width: 80px;
+    height: 60.3px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #007bff;
+    padding: 15px 30px;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    background: #fff;
+    cursor: pointer;
+    box-shadow: 0px 4px 8px 0 rgba(0, 0, 0, 0.2),
+      0px 6px 20px 0 rgba(0, 0, 0, 0.19);
+    z-index: 16;
+    font-family: 'MyFont';
+    transition: all 0.3s ease;
+    transform: translate(-50%, -50%);
+  }
+
+  .sita {
+    position: absolute;
+    top: 85%;
+    left: 50%;
+    width: 80px;
+    height: 60.3px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #007bff;
+    padding: 15px 30px;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    background: #fff;
+    cursor: pointer;
+    box-shadow: 0px 4px 8px 0 rgba(0, 0, 0, 0.2),
+      0px 6px 20px 0 rgba(0, 0, 0, 0.19);
+    z-index: 16;
+    font-family: 'MyFont';
+    transition: all 0.3s ease;
+    transform: translate(-50%, -50%);
+  }
+
+  #tetris {
+    display: block;
+    z-index: 10;
+    background: #000;
+    position: fixed;
+    background-image: url(sen.png);
+    background-size: 8.3333333333333333333333333333333333333333333333333333333333333% 5%;
+  }
+
+  #sen {
+    overflow: hidden;
+    position: relative;
+    z-index: 100000;
+    width: 960;
+    border: solid 4px rgb(74, 74, 74);
+    height: 1600;
+    border-radius: 4px;
+  }
+
+
+  .star:nth-of-type(1) {
+    --angle: 00deg;
+    --z: -100px;
+    --delay: -2.0s;
+  }
+
+  .star:nth-of-type(2) {
+    --angle: 30deg;
+    --z: -200px;
+    --delay: -1.3s;
+  }
+
+  .star:nth-of-type(3) {
+    --angle: 60deg;
+    --z: -10px;
+    --delay: -4.2s;
+  }
+
+
+  .star:nth-of-type(4) {
+    --angle: 90deg;
+    --z: -90px;
+    --delay: -3.3s;
+  }
+
+  .star:nth-of-type(5) {
+    --angle: 120deg;
+    --z: -180px;
+    --delay: -2.1s;
+  }
+
+  .star:nth-of-type(6) {
+    --angle: 150deg;
+    --z: -300px;
+    --delay: -5.3s;
+  }
+
+  .star:nth-of-type(7) {
+    --angle: 180deg;
+    --z: -150px;
+    --delay: -6.7s;
+  }
+
+  .star:nth-of-type(8) {
+    --angle: 210deg;
+    --z: -220px;
+    --delay: -1.5s;
+  }
+
+  .star:nth-of-type(9) {
+    --angle: 240deg;
+    --z: -250px;
+    --delay: -2.4s;
+  }
+
+  .star:nth-of-type(10) {
+    --angle: 270deg;
+    --z: -30px;
+    --delay: -3.1s;
+  }
+
+  .star:nth-of-type(11) {
+    --angle: 300deg;
+    --z: -80px;
+    --delay: -5.0s;
+  }
+
+  .star:nth-of-type(12) {
+    --angle: 330deg;
+    --z: -120px;
+    --delay: -7.1s;
+  }
+
+  .anim {
+    background-color: white;
+    animation: anim 4s var(--delay) linear infinite;
+  }
+
+  @keyframes anim {
+    from {
+      transform:
+        translate(-50%, -50%) rotate(var(--angle)) translateY(-100px) translateZ(var(--z));
+    }
+
+    to {
+      transform:
+        translate(-50%, -50%) rotate(var(--angle)) translateY(-75vw) translateZ(var(--z));
+    }
+  }
+</style>
